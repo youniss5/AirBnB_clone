@@ -1,43 +1,48 @@
 #!/usr/bin/python3
 """ Module to define base class"""
-import uuid
 from datetime import datetime
-
+from uuid import uuid4
+import models
 
 class BaseModel:
     """ this is a base class"""
     def __init__(self, *args, **kwargs):
-        """this is a new model"""
-        if not kwargs:
-            from models import storage
-            self.id = str(uuid.uuid4())
-            self.created_at = datetime.now()
-            self.updated_at = datetime.now()
-            storage.new(self)
+        """ Construct """
+        if kwargs:
+            for key, value in kwargs.items():
+                if key == '__class__':
+                    continue
+                elif key == 'updated':
+                    value = datetime.strptime(value, "%Y-%m-%dT%H:%M:%S.%f")
+                elif key == 'created':
+                    value = datetime.strptime(value, "%Y-%m-%dT%H:%M:%S.%f")
+                if 'id' not in kwargs.keys():
+                    self.id = str(uuid4())
+                if 'created' not in kwargs.keys():
+                    self.created = datetime.now()
+                if 'updated' not in kwargs.keys():
+                    self.updated = datetime.now()
+                setattr(self, key, value)
         else:
-            wargs['updated_at'] = datetime.strptime(kwargs['updated_at'],
-                                                     '%Y-%m-%dT%H:%M:%S.%f')
-            kwargs['created_at'] = datetime.strptime(kwargs['created_at'],
-                                                     '%Y-%m-%dT%H:%M:%S.%f')
-            del kwargs['__class__']
-            self.__dict__.update(kwargs)
+            self.id = str(uuid4())
+            self.created = datetime.now()
+            self.updated = self.created
+            models.storage.new(self)
+
     def save(self):
         """this updates time when instance is changed"""
-        self.updated_at = datetime.now()
-        storage.save()
+        self.updated = datetime.now()
+        models.storage.save()
 
     def to_dict(self):
         """instance to dictionary format"""
-        dictionary = {}
-        dictionary.update(self.__dict__)
-        dictionary.update({'__class__':
-                          (str(type(self)).split('.')[-1]).split('\'')[0]})
-        dictionary['created_at'] = self.created_at.isoformat()
-        dictionary['updated_at'] = self.updated_at.isoformat()
-        return dictionary
-
+        aux_dict = self.__dict__.copy()
+        aux_dict['__class__'] = self.__class__.__name__
+        aux_dict['created'] = self.created.isoformat()
+        aux_dict['updated'] = self.updated.isoformat()
+        return aux_dict
     def __str__(self):
         """instante to string """
-        cls = (str(type(self)).split('.')[-1]).split('\'')[0]
-        return '[{}] ({}) {}'.format(cls, self.id, self.__dict__)
+        return('[' + type(self).__name__ + '] (' + str(self.id) +
+               ') ' + str(self.__dict__))
 

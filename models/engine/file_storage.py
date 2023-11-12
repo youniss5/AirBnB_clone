@@ -1,6 +1,8 @@
 #!/usr/bin/python3
 """module for class storage"""
 import json
+import uuid
+import os
 
 
 class FileStorage:
