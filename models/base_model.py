@@ -4,6 +4,7 @@ from datetime import datetime
 from uuid import uuid4
 import models
 
+
 class BaseModel:
     """ this is a base class"""
     def __init__(self, *args, **kwargs):
@@ -12,34 +13,34 @@ class BaseModel:
             for key, value in kwargs.items():
                 if key == '__class__':
                     continue
-                elif key == 'updated':
+                elif key == 'updated_at':
                     value = datetime.strptime(value, "%Y-%m-%dT%H:%M:%S.%f")
-                elif key == 'created':
+                elif key == 'created_at':
                     value = datetime.strptime(value, "%Y-%m-%dT%H:%M:%S.%f")
                 if 'id' not in kwargs.keys():
                     self.id = str(uuid4())
-                if 'created' not in kwargs.keys():
-                    self.created = datetime.now()
-                if 'updated' not in kwargs.keys():
-                    self.updated = datetime.now()
+                if 'created_at' not in kwargs.keys():
+                    self.created_at = datetime.now()
+                if 'updated_at' not in kwargs.keys():
+                    self.updated_at = datetime.now()
                 setattr(self, key, value)
         else:
             self.id = str(uuid4())
-            self.created = datetime.now()
-            self.updated = self.created
+            self.created_at = datetime.now()
+            self.updated_at = self.created_at
             models.storage.new(self)
 
     def save(self):
         """this updates time when instance is changed"""
-        self.updated = datetime.now()
+        self.updated_at = datetime.now()
         models.storage.save()
 
     def to_dict(self):
         """instance to dictionary format"""
         aux_dict = self.__dict__.copy()
         aux_dict['__class__'] = self.__class__.__name__
-        aux_dict['created'] = self.created.isoformat()
-        aux_dict['updated'] = self.updated.isoformat()
+        aux_dict['created'] = self.created_at.isoformat()
+        aux_dict['updated'] = self.updated_at.isoformat()
         return aux_dict
     def __str__(self):
         """instante to string """
