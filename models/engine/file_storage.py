@@ -11,18 +11,18 @@ class FileStorage:
         """ objects to return  """
         return FileStorage.__objects
 
-    def save(self):
-        """ objects to json file """
-        with open(FileStorage.__file_path, 'w') as f:
-            tem = {}
-            tem.update(FileStorage.__objects)
-            for key, val in tem.items():
-                tem[key] = val.to_dict()
-            json.dump(tem, f)
-      
     def new(self, obj):
          """ dictionary the object with a kye"""
          FileStorage.__objects[obj.__class__.__name__ + "." + str(obj.id)] = obj
+
+    def save(self):
+        """ objects to json file """
+        with open(FileStorage.__file_path, 'w') as f:
+            temp = {}
+            temp.update(FileStorage.__objects)
+            for key, val in temp.items():
+                temp[key] = val.to_dict()
+            json.dump(temp, f)
 
     def reload(self):
         """ file to reload """
@@ -40,11 +40,10 @@ class FileStorage:
                     'Review': Review
                   }
         try:
-            tem = {}
+            temp = {}
             with open(FileStorage.__file_path, 'r') as f:
-                tem = json.load(f)
+                temp = json.load(f)
                 for key, val in temp.items():
                         self.all()[key] = classes[val['__class__']](**val)
         except FileNotFoundError:
             pass
-

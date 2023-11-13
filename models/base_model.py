@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 """ Module to define base class"""
-from datetime import datetime
 import uuid
+from datetime import datetime
 
 
 class BaseModel:
@@ -22,6 +22,11 @@ class BaseModel:
             del kwargs['__class__']
             self.__dict__.update(kwargs)
 
+    def __str__(self):
+        """instante to string """
+        cls = (str(type(self)).split('.')[-1]).split('\'')[0]
+        return '[{}] ({}) {}'.format(cls, self.id, self.__dict__)
+
     def save(self):
         """this updates time when instance is changed"""
         from models import storage
@@ -30,15 +35,10 @@ class BaseModel:
 
     def to_dict(self):
         """instance to dictionary format"""
-        dictionary = {}
-        dictionary.update(self.__dict__)
-        dictionary.update({'__class__':
+        dictt = {}
+        dictt.update(self.__dict__)
+        dictt.update({'__class__':
                           (str(type(self)).split('.')[-1]).split('\'')[0]})
-        dictionary['created_at'] = self.created_at.isoformat()
-        dictionary['updated_at'] = self.updated_at.isoformat()
-        return dictionary
-
-    def __str__(self):
-        """instante to string """
-        cls = (str(type(self)).split('.')[-1]).split('\'')[0]
-        return '[{}] ({}) {}'.format(cls, self.id, self.__dict__)
+        dictt['created_at'] = self.created_at.isoformat()
+        dictt['updated_at'] = self.updated_at.isoformat()
+        return dictt
